@@ -2,7 +2,7 @@
 ;
 ;
 ;        Routine lecture FDC standard
-;	 pour DSK2DISC
+;    pour DSK2DISC
 ;
 ;
 ;
@@ -95,7 +95,7 @@ PUTFDC
          JP   P,$-3
 
          POP  AF
-	 inc c
+     inc c
          OUT  (C),A
          RET  
 ;
@@ -107,7 +107,7 @@ GETFDC
          JP   P,$-3
  ;        CALL WTDATAOK
 
-	 inc c
+     inc c
          IN   A,(C)
          RET  
 ;
@@ -115,7 +115,7 @@ GETFDC
 ;Change de piste.
 ;A=piste
 GOTOPIST
-	ld (GPNOP+1),a
+    ld (GPNOP+1),a
          LD   A,%00001111
          CALL PUTFDC
          LD   A,(LECTEUR)
@@ -123,7 +123,7 @@ GOTOPIST
          LD   A,(TETE)
          OR   B
          CALL PUTFDC                    ;Envoie ID lecteur
-GPNOP    LD   A,0	              ;Envoie no piste
+GPNOP    LD   A,0                 ;Envoie no piste
          CALL PUTFDC
 ;
          CALL WAITEND
@@ -137,29 +137,29 @@ GPNOP    LD   A,0	              ;Envoie no piste
 ;Effectue un SCANID. Les infos ne servent qu'a ReadDSK.
 ;Utilise pour le mode The Demo ou 5kb3, mais aussi par ReadDSK.
 ;RET=D=Taille E=piste H=ID L=Tete
-.SCANID
-	ld a,%01001010
-	call PUTFDC
+SCANID
+    ld a,%01001010
+    call PUTFDC
          LD   A,(LECTEUR)
          LD   B,A
          LD   A,(TETE)
          OR   B
-	call PUTFDC
+    call PUTFDC
 
-	call GETFDC
-	ld (ST0),a
-	call GETFDC
-	call GETFDC
+    call GETFDC
+    ld (ST0),a
+    call GETFDC
+    call GETFDC
 
-	call GETFDC	;get nopiste
-	ld e,a
-	call GETFDC	;tete
-	ld l,a
-	call GETFDC	;id
-	ld h,a
-	call GETFDC	;taille
-	ld d,a
-	ret
+    call GETFDC ;get nopiste
+    ld e,a
+    call GETFDC ;tete
+    ld l,a
+    call GETFDC ;id
+    ld h,a
+    call GETFDC ;taille
+    ld d,a
+    ret
 
 ;
 ;
@@ -181,39 +181,39 @@ GPNOP    LD   A,0	              ;Envoie no piste
 ;HL=ou le charger
 ;RETOUR=Erreur FDC. A=0=ok et carry=1
 READSECTDOS
-	ld (RSDPISTE+1),a
-	ld a,b
-	ld (RSDSECT+1),a
-	ld a,c
-	ld (RSDSIDE+1),a
-	ld a,d
-	ld (RSDSIZE+1),a
-	ld a,e
-	ld (RSDGAP+1),a
-	ld (RSLOAD+1),hl
+    ld (RSDPISTE+1),a
+    ld a,b
+    ld (RSDSECT+1),a
+    ld a,c
+    ld (RSDSIDE+1),a
+    ld a,d
+    ld (RSDSIZE+1),a
+    ld a,e
+    ld (RSDGAP+1),a
+    ld (RSLOAD+1),hl
 
-	ld a,(RSDPISTE+1)
-	call GOTOPIST
+    ld a,(RSDPISTE+1)
+    call GOTOPIST
 
          LD   A,%01000110
          CALL PUTFDC
          LD   A,(LECTEUR)
          LD   B,A
          LD   A,(RSDSIDE+1)
-	 rla
-	 rla
-	 and %100
+     rla
+     rla
+     and %100
          OR   B                         ;ID lecteur
          CALL PUTFDC
 RSDPISTE  LD   A,0              ;No piste
          CALL PUTFDC
-RSDSIDE	 ld a,0				;head
+RSDSIDE  ld a,0             ;head
          CALL PUTFDC
 RSDSECT   LD   A,0              ;ID sect
          CALL PUTFDC
 RSDSIZE   LD   A,0                       ;Taille sect
          CALL PUTFDC
-	 LD   A,(RSDSECT+1)               ;dernier sect a lire
+     LD   A,(RSDSECT+1)               ;dernier sect a lire
          CALL PUTFDC
 RSDGAP    LD   A,0                   ;GAP
          CALL PUTFDC
@@ -222,8 +222,8 @@ RSDGAP    LD   A,0                   ;GAP
 ;
 ;On      recupere les donnees du sect
 RSREAD   LD   BC,#FB7E
-	 ld c,%00100000
-RSLOAD   LD   HL,0	              ;On le charge ds buffer
+     ld c,%00100000
+RSLOAD   LD   HL,0                ;On le charge ds buffer
 ;
 RSLOOP
          IN   A,(C)
@@ -232,20 +232,20 @@ RSLOOP
          JR   Z,RSFIN
          INC  C
          INI
-	 INC  B
+     INC  B
          DEC  C
 
-;	inc c
-;	in a,(c)
-;	ld (hl),a
-;	inc hl
-;	dec c
+;   inc c
+;   in a,(c)
+;   ld (hl),a
+;   inc hl
+;   dec c
 
-;	add a,e				;add to checksum
-;	ld e,a
-;	ld a,d
-;	adc a,0
-;	ld d,a
+;   add a,e             ;add to checksum
+;   ld e,a
+;   ld a,d
+;   adc a,0
+;   ld d,a
 
          JR   RSLOOP
 ;
@@ -261,9 +261,9 @@ RSFIN
          CALL GETFDC
          CALL GETFDC
 
-	call TESTERR
+    call TESTERR
 ;
-	ret
+    ret
 
 ;
 ;
@@ -280,45 +280,45 @@ RSFIN
 ;HL=ou le charger
 ;RETOUR=Erreur FDC. A=0=ok Carry=1 et HL=pointe apres les donnees ecrites.
 READSECT
-	push af
-	ld a,b
-	ld (RSSECT+1),a
-	ld a,c
-	ld (RSSIDE+1),a
-	ld a,d
-	ld (RSSIZE+1),a
-	ld a,e
-	ld (RSPISTE+1),a
-	ld (RSLOAD+1),hl
+    push af
+    ld a,b
+    ld (RSSECT+1),a
+    ld a,c
+    ld (RSSIDE+1),a
+    ld a,d
+    ld (RSSIZE+1),a
+    ld a,e
+    ld (RSPISTE+1),a
+    ld (RSLOAD+1),hl
 
-	pop af
-	call GOTOPIST
+    pop af
+    call GOTOPIST
 
-;	ld de,0				;CHECKSUM
+;   ld de,0             ;CHECKSUM
 
          LD   A,%01000110
          CALL PUTFDC
          LD   A,(LECTEUR)
          LD   B,A
-	 ld a,(TETE)
-	 or b
+     ld a,(TETE)
+     or b
          CALL PUTFDC
 RSPISTE  LD   A,0              ;No piste
          CALL PUTFDC
-RSSIDE	 ld a,0				;head
+RSSIDE   ld a,0             ;head
          CALL PUTFDC
 RSSECT   LD   A,0              ;ID sect
          CALL PUTFDC
 RSSIZE   LD   A,0                       ;Taille sect
          CALL PUTFDC
-	 LD   A,(RSSECT+1)               ;dernier sect a lire
+     LD   A,(RSSECT+1)               ;dernier sect a lire
          CALL PUTFDC
-	LD   A,#4e
+    LD   A,#4e
          CALL PUTFDC
          LD   A,#FF                     ;long eff sect
          CALL PUTFDC
 
-	jp RSREAD
+    jp RSREAD
 
 
 
@@ -335,29 +335,29 @@ RSSIZE   LD   A,0                       ;Taille sect
 ;L=side OU ECRIRE. Utile principalement pour double sided dsk.
 ;RET=IX pointe sur les DATA su prochain secteur SAUF si erreur disc !
 WRITESECT
-	call GOTOPIST
+    call GOTOPIST
 
-	ld a,%01000101		;Code instruction 'ecriture secteur'
-	bit 6,(iy+5)		;Secteur efface a ecrire ?
-	jr z,WRSENEFF
-	ld a,%01001001		;Code instruction 'ecriture secteur efface'
+    ld a,%01000101      ;Code instruction 'ecriture secteur'
+    bit 6,(iy+5)        ;Secteur efface a ecrire ?
+    jr z,WRSENEFF
+    ld a,%01001001      ;Code instruction 'ecriture secteur efface'
 WRSENEFF CALL PUTFDC
          LD   A,(LECTEUR)
-	 sla l
-	 sla l
+     sla l
+     sla l
          OR   L                         ;ID lecteur
          CALL PUTFDC
-	LD   A,(iy+0)              ;No piste
+    LD   A,(iy+0)              ;No piste
          CALL PUTFDC
-	ld a,(iy+1)				;head
+    ld a,(iy+1)             ;head
          CALL PUTFDC
-	ld a,(iy+2)              ;ID sect
+    ld a,(iy+2)              ;ID sect
          CALL PUTFDC
-	ld a,(iy+3)                       ;Taille sect
+    ld a,(iy+3)                       ;Taille sect
          CALL PUTFDC
-	ld a,(iy+2)               ;dernier sect a lire
+    ld a,(iy+2)               ;dernier sect a lire
          CALL PUTFDC
-	ld a,h			;gap
+    ld a,h          ;gap
          CALL PUTFDC
          LD   A,#ff                     ;long eff sect
          CALL PUTFDC
@@ -391,9 +391,9 @@ WSFIN
          CALL GETFDC
          CALL GETFDC
 
-	call TESTERR
+    call TESTERR
 ;
-	ret
+    ret
 
 
 
@@ -410,51 +410,51 @@ WSFIN
 ;db TrackNumber,    Side,   SectorID,   Sector size
 ;db FDC R1, FDC R2
 ;dw ADL
-.FORMAT
-	 ld a,(ix+0)
+FORMAT
+     ld a,(ix+0)
          CALL GOTOPIST
 ;
          LD   A,%01001101
          CALL PUTFDC
          LD   A,(LECTEUR)
          LD   B,A
-	ld a,(ix+1)
-	rl a
-	rl a
-	and %100
+    ld a,(ix+1)
+    rl a
+    rl a
+    and %100
 ;         LD   A,(TETE)
          OR   B                         ;ID lecteur
          CALL PUTFDC
-	 LD   A,(ix+2)                  ;taille sect
+     LD   A,(ix+2)                  ;taille sect
          CALL PUTFDC
-	 LD   A,(ix+3)                  ;Nb sects
+     LD   A,(ix+3)                  ;Nb sects
          CALL PUTFDC
-	 LD   A,(ix+4)                  ;GAP
+     LD   A,(ix+4)                  ;GAP
          CALL PUTFDC
-	 LD   A,(ix+5)                  ;Remplissage.
+     LD   A,(ix+5)                  ;Remplissage.
          CALL PUTFDC
 ;
 
 ;        ID sects pour chaq sect
 
-	 LD   d,(ix+3)		;d=nb sects pour boucle
+     LD   d,(ix+3)      ;d=nb sects pour boucle
 
-	ld bc,6
-	add ix,bc
+    ld bc,6
+    add ix,bc
 
-FRMSLP	 LD   A,(ix+0)                  ;Piste actuelle
+FRMSLP   LD   A,(ix+0)                  ;Piste actuelle
          CALL PUTFDC
-	 LD   A,(ix+1)			;side
+     LD   A,(ix+1)          ;side
          CALL PUTFDC
-	 LD   A,(ix+2)			;nom sect
+     LD   A,(ix+2)          ;nom sect
          CALL PUTFDC
-	 LD   A,(ix+3)			;Taille
+     LD   A,(ix+3)          ;Taille
          CALL PUTFDC
 ;
-	ld bc,8
-	add ix,bc
+    ld bc,8
+    add ix,bc
 
-	 dec d
+     dec d
          JR   NZ,FRMSLP
 ;
          CALL GETFDC
@@ -481,37 +481,37 @@ FRMSLP	 LD   A,(ix+0)                  ;Piste actuelle
 ;Deformatte un piste donnee en C, side D.
 ;RET=Carry=1=ok
 UNFORMAT
-	ld a,c
-	ld (TUFTRACK1),a
-	ld (TUFTRACK2),a
-	ld a,d
-	ld (TUFSIDE1),a
-	ld (TUFSIDE2),a
+    ld a,c
+    ld (TUFTRACK1),a
+    ld (TUFTRACK2),a
+    ld a,d
+    ld (TUFSIDE1),a
+    ld (TUFSIDE2),a
 
-	add a,"0"
-	ld (TXTUNFORMA3),a
+    add a,"0"
+    ld (TXTUNFORMA3),a
 
-	ld a,c
-	call NBTODEC
-	ld a,b
-	ld (TXTUNFORMA2),a
-	ld a,c
-	ld (TXTUNFORMA2+1),a
+    ld a,c
+    call NBTODEC
+    ld a,b
+    ld (TXTUNFORMA2),a
+    ld a,c
+    ld (TXTUNFORMA2+1),a
 
-	call CLEARITF
+    call CLEARITF
 
-	ld hl,TXTUNFORMAT
-	call PHRASE
+    ld hl,TXTUNFORMAT
+    call PHRASE
 
 
-	ld a,(DESTLECT)
-	call CHLECT
+    ld a,(DESTLECT)
+    call CHLECT
 
-	ld ix,TABUNFORMAT
-	call FORMAT
-	or a
-	jp z,RESOK
-	jp RESNOTOK
+    ld ix,TABUNFORMAT
+    call FORMAT
+    or a
+    jp z,RESOK
+    jp RESNOTOK
 
 
 
@@ -544,29 +544,29 @@ TESTERR
          JR   NZ,TESTFAIL
 ;
 TESTNOE
-	xor a
-	scf
+    xor a
+    scf
          RET  
 TESTEJEC
 TESTFAIL
-	ld a,1
-	or a
-	ret
+    ld a,1
+    or a
+    ret
 
 ;
-;FDCERR	di
-;	ld bc,#7f10
-;	out (c),c
-;	ld a,#4c
-;	out (c),a
-;	jr FDCERR
+;FDCERR di
+;   ld bc,#7f10
+;   out (c),c
+;   ld a,#4c
+;   out (c),a
+;   jr FDCERR
 ;
 ;
 ;
 ;
 
 ;
-	list
+    list
 ;**** Fin Code FDC CPC
-	nolist
+    nolist
 ;     

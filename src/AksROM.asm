@@ -225,7 +225,7 @@ AK_PRom ld c,0
     call #b90f
     ld a,c
     ld (AK_OldRom),a
-    jp CatPrg
+    jp CATPrg
 AK_PRet pop af
     ret
 AK_PatchFin
@@ -279,15 +279,15 @@ RD_Copy
     nolist
 
 
-    include "testcrtc.asm"
+    include "TestCrtc.asm"
 
-    include "getfile.asm"
-    include "sendfile.asm"
-    include "header.asm"
-    include "burn.asm"
-    include "memory.asm"
-    include "view.asm"
-    include "load.asm"
+    include "GetFile.asm"
+    include "SendFile.asm"
+    include "Header.asm"
+    include "Burn.asm"
+    include "Memory.asm"
+    include "View.asm"
+    include "Load.asm"
 
 
 
@@ -713,8 +713,10 @@ SB_Val0 ld a,b
 ;Get Filename
     ld e,(ix+2)
     ld d,(ix+3)
-    defb #dd : ld l,e
-    defb #dd : ld h,d
+    defb #dd 
+  ld l,e
+    defb #dd 
+  ld h,d
 
     ld l,(ix+1)
     ld h,(ix+2)
@@ -904,11 +906,12 @@ SB_PTFilename equ #be2e ;word. Pointe sur User+filename (1+8+3)
 
 
 CPCBooster_ADROM
-    org AD_CPCBooster, CPCBooster_ADROM
-    read "cpcbooster.asm"
+    ; org AD_CPCBooster, CPCBooster_ADROM XXX Original code for winape
+    org AD_CPCBooster
+    include "CPCBooster.asm"
 
-    read "writedsk.asm"
-    read "readdsk.asm"
+    include "WriteDSK.asm"
+    include "ReadDsk.asm"
 
 
 
