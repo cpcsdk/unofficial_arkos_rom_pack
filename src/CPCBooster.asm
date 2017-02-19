@@ -1,6 +1,9 @@
-	;CPCBooster communication code.
-	;V1.0 by Targhan/Arkos.
+    ;CPCBooster communication code.
+    ;V1.0 by Targhan/Arkos.
 
+    ifdef FLAVOR_CPCWIFI
+        fail "[ERROR] This code cannot be used for the CPC wifi. It is necessary to use specific code"
+    endif
 
 
 CPCB_InitCommand equ #f0
@@ -30,9 +33,9 @@ CPCB_FileCreated equ #80
 
 CPCB_TimeoutValue equ #4000
 
-	list
+    list
 ;**** Debut CPCBooster
-	nolist
+    nolist
 
 CPCB_CODEDEBUT
 
@@ -40,39 +43,39 @@ CPCB_CODEDEBUT
 ;Initialise CPCB, baudrate etc...,
 ;RET=Carry=1=ok 0=non detectee.
 CPCB_Init
-	ld bc,#ff00
-	in a,(c)
-	cp 170
-	jr nz,CPCBError
-	inc c
-	in a,(c)
-	cp 85
-	jr nz,CPCBError
+    ld bc,#ff00
+    in a,(c)
+    cp 170
+    jr nz,CPCBError
+    inc c
+    in a,(c)
+    cp 85
+    jr nz,CPCBError
 
-	ld c,#04		;Setting Baudrate to 115200.
-	ld a,#05
-	out (c),c
-	out (c),a
+    ld c,#04        ;Setting Baudrate to 115200.
+    ld a,#05
+    out (c),c
+    out (c),a
 
-	ld c,#07		;Asynchronous, no Parity, 1 bit stop, 8 bits carac.
-	ld a,%00000110
-	out (c),c
-	out (c),a
+    ld c,#07        ;Asynchronous, no Parity, 1 bit stop, 8 bits carac.
+    ld a,%00000110
+    out (c),c
+    out (c),a
 
-	ld c,#0b		;Enables buffer.
-	in a,(c)
-	set 4,a
-	out (c),a
+    ld c,#0b        ;Enables buffer.
+    in a,(c)
+    set 4,a
+    out (c),a
 
-	ld c,#1c		;Reset buffer.
-	xor a
-	out (c),a
+    ld c,#1c        ;Reset buffer.
+    xor a
+    out (c),a
 
-	scf
-	ret
+    scf
+    ret
 
 CPCBError or a
-	ret
+    ret
 
 
 
@@ -80,48 +83,48 @@ CPCBError or a
 ;Essaye de communiquer l'init avec le PC. Il y a un timeout pour reessayer si erreur.
 ;RET=Carry=1=ok 0=communication failed.
 CPCB_InitPC
-	ld a,CPCB_InitCommand
-	call CPCB_SendByte
+    ld a,CPCB_InitCommand
+    call CPCB_SendByte
 
-	call CPCB_GetByte
-	jr nc,CPCBError			;Not carry=timeout
-	cp CPCB_InitConfirmedFromPC
-	jr nz,CPCBError
-	scf
-	ret
+    call CPCB_GetByte
+    jr nc,CPCBError         ;Not carry=timeout
+    cp CPCB_InitConfirmedFromPC
+    jr nz,CPCBError
+    scf
+    ret
 
 
 ;Recoit un octet de la CPCB (avec flash de couleur. Activer encre d'abord !)
 ;RET=Carry=1=OK et A=byte   Carry=0=timeout
 CPCB_GetByte
-	ld bc,#7f55
-	out (c),c
-	ld bc,#ff1c
-	ld de,CPCB_TimeoutValue
+    ld bc,#7f55
+    out (c),c
+    ld bc,#ff1c
+    ld de,CPCB_TimeoutValue
 CPCBGBLp dec de
-	ld a,d
-	or e
-	jr z,CPCBError	;Timeout
-	in a,(c)
-	or a
-	jr z,CPCBGBLp
+    ld a,d
+    or e
+    jr z,CPCBError  ;Timeout
+    in a,(c)
+    or a
+    jr z,CPCBGBLp
 
-	inc c
-	in a,(c)
+    inc c
+    in a,(c)
 ;
-	ld bc,#7f44
-	out (c),c
-	scf
-	ret
+    ld bc,#7f44
+    out (c),c
+    scf
+    ret
 
 
 
 ;Envoi un octet a la CPCB
 ;A=byte
 CPCB_SendByte
-	ld bc,#ff08
-	out (c),a
-	ret
+    ld bc,#ff08
+    out (c),a
+    ret
 
 
 
@@ -131,14 +134,14 @@ CPCB_SendByte
 ;HL=donnees
 ;DE=taille
 CPCB_SendXBytes
-	ld a,(hl)
-	call CPCB_SendByte
-	inc hl
-	dec de
-	ld a,e
-	or d
-	jr nz,CPCB_SendXBytes
-	ret
+    ld a,(hl)
+    call CPCB_SendByte
+    inc hl
+    dec de
+    ld a,e
+    or d
+    jr nz,CPCB_SendXBytes
+    ret
 
 
 
@@ -151,24 +154,24 @@ CPCB_SendXBytes
 ;HL=Nombre d'octets a recevoir
 ;DE=Destination
 CPCB_GetXBytes
-	ld a,CPCB_ReceiveCommand
-	call CPCB_SendByte
-	ld a,l				;Send the size to receive.
-	call CPCB_SendByte
-	ld a,h
-	call CPCB_SendByte
+    ld a,CPCB_ReceiveCommand
+    call CPCB_SendByte
+    ld a,l              ;Send the size to receive.
+    call CPCB_SendByte
+    ld a,h
+    call CPCB_SendByte
 CPCB_GetXBLoop
-	push de
+    push de
 CPCB_GetXBL2 call CPCB_GetByte
-	jr nc,CPCB_GetXBL2		;Si Timeout, on recommence
-	pop de
-	ld (de),a
-	inc de
-	dec hl
-	ld a,l
-	or h
-	jr nz,CPCB_GetXBLoop
-	ret
+    jr nc,CPCB_GetXBL2      ;Si Timeout, on recommence
+    pop de
+    ld (de),a
+    inc de
+    dec hl
+    ld a,l
+    or h
+    jr nz,CPCB_GetXBLoop
+    ret
 
 
 
@@ -178,49 +181,49 @@ CPCB_GetXBL2 call CPCB_GetByte
 ;HL=filename
 ;RET=Carry=1=ok  0=pas ok
 CPCB_OpenInputFile
-	ld a,CPCB_OpenInputFileCommand
-	jr CPCB_OIF2
+    ld a,CPCB_OpenInputFileCommand
+    jr CPCB_OIF2
 
 
 ;Quand transfert termine, envoi de commande de fin. Ferme tous les fichiers en sortie et entree.
 CPCB_SendEndCommand
-	ld a,CPCB_EndCommand
-	call CPCB_SendByte
-	ret
+    ld a,CPCB_EndCommand
+    call CPCB_SendByte
+    ret
 
 
 
 ;Demande de nom fichier. Recoit 12 bytes (nom+point+ext)
 ;HL=Destination
 CPCB_AskFileName
-	ld a,CPCB_AskFileNameCommand
-	call CPCB_SendByte
-	ld d,12
+    ld a,CPCB_AskFileNameCommand
+    call CPCB_SendByte
+    ld d,12
 CPCB_AFNLoop
-	push de
-	call CPCB_GetByte
-	pop de
-	ld (hl),a
-	inc hl
-	dec d
-	jr nz,CPCB_AFNLoop
-	ret
+    push de
+    call CPCB_GetByte
+    pop de
+    ld (hl),a
+    inc hl
+    dec d
+    jr nz,CPCB_AFNLoop
+    ret
 
 
 ;Demande de filesize. Recoit 4 bytes, du point faible au point fort
 ;HL=Destination
 CPCB_AskFileSize
-	ld a,CPCB_AskFileSizeCommand
-	call CPCB_SendByte
-	ld d,4
-	jr CPCB_AFNLoop
+    ld a,CPCB_AskFileSizeCommand
+    call CPCB_SendByte
+    ld d,4
+    jr CPCB_AFNLoop
 
 
 ;Le pointeur PC du fichier est remis au debut du fichier.
 CPCB_RewindFile
-	ld a,CPCB_RewindCommand
-	call CPCB_SendByte
-	ret
+    ld a,CPCB_RewindCommand
+    call CPCB_SendByte
+    ret
 
 
 
@@ -228,19 +231,19 @@ CPCB_RewindFile
 ;HL=filename (8+point+3)
 ;RET=Carry=1=Ok 0=Echec
 CPCB_CreateOutputFile
-	ld a,CPCB_CreateOutputFileCommand
+    ld a,CPCB_CreateOutputFileCommand
 CPCB_OIF2
-	call CPCB_SendByte
+    call CPCB_SendByte
 
-	ld de,12
-	call CPCB_SendXBytes
+    ld de,12
+    call CPCB_SendXBytes
 
-	call CPCB_GetByte
-	jp nc,CPCBError			;Not carry=timeout
-	cp CPCB_FileCreated
-	jp nz,CPCBError
-	scf
-	ret
+    call CPCB_GetByte
+    jp nc,CPCBError         ;Not carry=timeout
+    cp CPCB_FileCreated
+    jp nz,CPCBError
+    scf
+    ret
 
 
 
@@ -248,23 +251,23 @@ CPCB_OIF2
 ;HL=donnees
 ;DE=taille
 CPCB_AddDataToOutputFile
-	ld a,CPCB_AddDataToOutputFileCommand
-	call CPCB_SendByte
-	ld a,e
-	call CPCB_SendByte
-	ld a,d
-	call CPCB_SendByte
+    ld a,CPCB_AddDataToOutputFileCommand
+    call CPCB_SendByte
+    ld a,e
+    call CPCB_SendByte
+    ld a,d
+    call CPCB_SendByte
 
-	call CPCB_SendXBytes
-	ret
+    call CPCB_SendXBytes
+    ret
 
 
 
 ;Fermeture du fichier PC en sortie.
 CPCB_CloseOutputFile
-	ld a,CPCB_CloseOutputFileCommand
-	call CPCB_SendByte
-	ret
+    ld a,CPCB_CloseOutputFileCommand
+    call CPCB_SendByte
+    ret
 
 
 ;Dis au PC de generer un DSK vide, pour l'instant.
@@ -272,34 +275,34 @@ CPCB_CloseOutputFile
 ;H=NBTracks L=NBSides
 ;D=1er char E=2e char
 CPCB_InitDSK
-	ld a,CPCB_InitDSKCommand
-	call CPCB_SendByte
-	ld a,d
-	call CPCB_SendByte
-	ld a,e
-	call CPCB_SendByte
-	ld a,h
-	call CPCB_SendByte
-	ld a,l
-	call CPCB_SendByte
-	ret
+    ld a,CPCB_InitDSKCommand
+    call CPCB_SendByte
+    ld a,d
+    call CPCB_SendByte
+    ld a,e
+    call CPCB_SendByte
+    ld a,h
+    call CPCB_SendByte
+    ld a,l
+    call CPCB_SendByte
+    ret
 
 
 ;Previens le PC que les donnees d'une track (info+donnees) vont arriver
 CPCB_SendTrack
-	ld a,CPCB_SendTrackCommand
-	call CPCB_SendByte
-	ret
+    ld a,CPCB_SendTrackCommand
+    call CPCB_SendByte
+    ret
 
 ;Dis au PC qu'il n'y a plus de track a recevoir. Il peut donc ecrire le DSK sur le DD.
 CPCB_NoMoreTrack
-	ld a,CPCB_NoMoreTrackCommand
-	call CPCB_SendByte
-	ret
+    ld a,CPCB_NoMoreTrackCommand
+    call CPCB_SendByte
+    ret
 
 
 CPCB_CODEFIN
 
-	list
+    list
 ;**** Fin CPCBooster
-	nolist
+    nolist
