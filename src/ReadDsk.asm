@@ -60,7 +60,8 @@
 
 RD_STANDALONE equ 0 ;+1     ;Si a 1, alors il faut que Writedsk aussi soit en stand alone !
 
-RD_ADROM equ #d600      ;Adresse en rom. On la fixe car le placement dynamique fait chier.
+;RD_ADROM equ #d600      ;Adresse en rom. On la fixe car le placement dynamique fait chier. ; Mandatory ?
+RD_ADROM equ $
 
 RD_AD_CODENORMAL equ #7000
 
@@ -85,7 +86,7 @@ ADLSTSECTS equ #100     ;Adresse de LSTSECTS. Taille max = 35*8=#118
 
     if ISROM
 
-    org RD_ADROM
+  ;  org RD_ADROM
     rorg RD_AD_CODENORMAL
     endif
 

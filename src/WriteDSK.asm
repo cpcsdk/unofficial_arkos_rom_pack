@@ -42,7 +42,8 @@ WD_STANDALONE equ 0 ;+1
 ISROM   equ 1 ;-1
 ;ISRSX  equ 0
 
-WR_ADROM equ #dcb0 ;#e000   ;Adresse en rom. On la fixe car le placement dynamique fait chier.
+;WR_ADROM equ #dcb0 ;#e000   ;Adresse en rom. On la fixe car le placement dynamique fait chier. ; XXX Mandatory ?
+WR_ADROM equ $ ;#e000   ;Adresse en rom. On la fixe car le placement dynamique fait chier.
 
 WR_ADCODENORMAL equ #8080   ;Adresse du code.
 ADINITRSX equ #8000 ;Petit lanceur RSX.
@@ -279,7 +280,7 @@ BUFENTRIESSIZE equ #600
     if ISROM
 ;   org ADCODENORMAL,MKDK2
  ;   org WR_ADCODENORMAL,WR_ADROM ; XXX Winape stuff converted
-    org WR_ADROM
+  ;  org WR_ADROM
     rorg WR_ADCODENORMAL
     endif
 
