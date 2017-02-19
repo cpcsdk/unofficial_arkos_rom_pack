@@ -1,0 +1,27 @@
+# AKS Rom
+
+
+Unofficial copy of the Arkos ROM pack in order to ease the creation of different flavors:
+
+ - The original one for the CPCBooster
+ - A new one with the Amstrad CPC Wifi card (not done)
+
+
+## Build
+
+To build the CPCbooster version:
+
+```bash
+make FLAVOR=CPCBOOSTER
+```
+
+To build the CPC Wifi version:
+```bash
+make FLAVOR=CPCWIFI
+```
+
+## Limitations
+
+Although the CPCbooster version assembles with `vasm` it has not been tested yet on a real machine (neither an emulator).
+Inconcistencies between `Winape` assembler and `vasm` may have (temporaly) broken stuff.
+
