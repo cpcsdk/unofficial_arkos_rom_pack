@@ -3104,7 +3104,7 @@ PHRBB5A ld a,(hl)
     inc hl
     jr PHRBB5A
 
-    include "CPCBooster.asm"
+    include "serial.asm"
 
     endif
 

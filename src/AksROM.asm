@@ -908,7 +908,7 @@ SB_PTFilename equ #be2e ;word. Pointe sur User+filename (1+8+3)
 CPCBooster_ADROM
     ; org AD_CPCBooster, CPCBooster_ADROM XXX Original code for winape
     rorg AD_CPCBooster
-        include "CPCBooster.asm"
+        include "serial.asm"
     rend
 
     ; XXX I assume the rorg stuff is done at the start of read/writ

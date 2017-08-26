@@ -8,8 +8,10 @@
 # Possible FLAVORS:
 # CPCBOOSTER for the CPCbooster ROM
 # CPCWIFI for the M4 card (TODO)
+# ALBIREO for the Albireo v1.1
 #FLAVOR?=CPCBOOSTER
-FLAVOR?=CPCWIFI
+#FLAVOR?=CPCWIFI
+FLAVOR?=ALBIREO
 
 OUT:=$(shell mkdir -p out/$(FLAVOR) && echo out/$(FLAVOR))
 

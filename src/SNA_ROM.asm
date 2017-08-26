@@ -694,7 +694,7 @@ SNA_ROM_print_bchr
     ;*** debut cpcb
     nolist
                             ; CPCBooster device
-                            include "CPCBooster.asm"
+                            include "serial.asm"
 
 SNA_ROM_snarkos:                        
                             ; Booster & AFT are OK
