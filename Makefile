@@ -17,7 +17,7 @@ OUT:=$(shell mkdir -p out/$(FLAVOR) && echo out/$(FLAVOR))
 
 ASMFLAGS="-DFLAVOR_$(FLAVOR)"
 
-build: $(OUT)/AksROM.rom $(OUT)/SNA_ROM.rom
+build: $(OUT)/AksROM.rom $(OUT)/SNAROM.rom
 
 # Overwrite the default assembling routine in order to select the output folder on fly
 $(OUT)/%.o: src/%.asm

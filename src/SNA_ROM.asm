@@ -33,16 +33,24 @@ ROM_init
                         
                         ; display bullshit
                         CALL SNA_ROM_print_ntstr
+                        ifdef FLAVOR_CPCBOOSTER
                         DEFB " SNArkos v",SNA_ROMVersion,".",SNA_ROMRevision," [05/2006]"
+                        endif
+
+                        ifdef FLAVOR_ALBIREO
+                        DEFB " SNAlbireo v",SNA_ROMVersion,".",SNA_ROMRevision," [05/2006]"
+                        endif
+
+
                         DEFB 13,10,10
                         DEFB 0
 ROM_skip_init_msg
                         ; system craps
                         POP HL
- POP DE
+                        POP DE
                         AND A
                         LD BC,32
- SBC HL,BC ;grab 32 bytes from top of memory
+                        SBC HL,BC ;grab 32 bys from top of memory
                         SCF
                         RET 
 
@@ -51,10 +59,14 @@ ROM_skip_init_msg
                             ; must be called when the rom is initialised
                             ; required for snautoboot
 SNA_ROM_Autoboot:
+                            LD A,'A'
+                            CALL &BB5A
                             ; Check CPCBooster
                             call SNA_ROM_CPCB_Check
                             ret c ; do nothing at boot if something is wrong
                             
+                            LD A,'B'
+                            CALL &BB5A
                             ; Fetch SNARAM
                             call SNA_ROM_Get_SNARAM
                             
@@ -63,6 +75,8 @@ SNA_ROM_Autoboot:
                             bit 0,(hl)  ; if bit0=1 then snautoboot is enabled
                             ret z
                             
+                            LD A,'C'
+                            CALL &BB5A
                             ; keyboardscan
                             ld bc,&F782
                             out (c),c
@@ -87,6 +101,8 @@ SNA_ROM_Autoboot:
                             bit 7,d ; CTRL
                             jp z,SNA_ROM_Skip_Autoboot
                             
+                            LD A,'D'
+                            CALL &BB5A
                             ; Check AFT Link
                             call SNA_ROM_AFT_Check
                             ret c ; do nothing if no answer from AFT
@@ -231,6 +247,8 @@ SNA_ROM_CPCB_Check
                             call CPCB_Init
                             jr nc,SNA_ROM_SystemFail_BoosterInit
     
+                            ifdef FLAVOR_CPCBOOSTER
+
                             ; BIOS version 1.5+ only
                             ; check if the Read/Write RAM functions are available
                             ld bc,&FF28
@@ -245,6 +263,12 @@ SNA_ROM_CPCB_Check
                             in a,(c)
                             cp e
                             jr nz,SNA_ROM_SystemFail_NoRAM_RW
+
+                            endif
+
+                            ifdef FLAVOR_ALBIREO
+                            ccf
+                            endif
                             
                             xor a
                             ret
@@ -383,7 +407,13 @@ SNA_UpperROM_enabled
                             ret
                             
 SNA_AFT_CloseLink
+                            ifdef FLAVOR_CPCBOOSTER
                             ld bc,#ff08
+                            endif
+
+                            ifdef FLAVOR_ALBIREO
+                            ld bc,ACE_THR
+                            endif
                             ld a,&F2
                             out (c),a ; close
                             ret
@@ -457,10 +487,25 @@ SNA_RSX_snahv_name_loop
 
 SNA_RSX_snahv_getValue
                             di
+                        ifdef FLAVOR_CPCBOOSTER
                             ld bc,&FF28
                             out (c),a
                             ld bc,&FF2A
                             in a,(c)
+                        endif
+
+                        ifdef FLAVOR_ALBIREO
+                             ; We use the CH376 internal memory here. It is
+                             ; probably a good idea to unmount all drives before
+                             ; doing so, since these variables serve a purpose
+                             ; in the CH376 itself, too...
+                             LD BC,&FE80
+                             LD D,&0A ; CMD_READ8
+                             OUT (C),D
+                             INC C
+                             OUT (C),A ; Send address
+                             IN A,(C)  ; Get data
+                        endif
                             ei
                             ret
 
@@ -635,6 +680,8 @@ SNA_ROM_Init_SNARAM
                             ldir
 
                             ; &BE00 to SNARAM
+
+                            ifdef FLAVOR_CPCBOOSTER
 SNA_ROM_Set_SNARAM
                             ld bc,&FF28
                             ld l,&F0
@@ -649,7 +696,36 @@ SNA_ROM_Set_SNARAM_loop
                             jr z,SNA_ROM_Set_SNARAM_loop
                             ret
 
+                            endif
+
+                            ifdef FLAVOR_ALBIREO
+
+SNA_ROM_Set_SNARAM
+                             ld hl,&BE00
+                             LD DE,&0BF0 ; CMD_WRITE8 + Address
+
+SNA_ROM_Set_SNARAM_loop
+                             LD A,(HL)
+                             LD BC,&FE80
+                             OUT (C),D
+                             INC C
+                             OUT (C),E
+                             INC E
+                             OUT (C),A ; Data
+                             INC HL
+                             BIT 4,L
+                             JR Z,SNA_ROM_Set_SNARAM_loop
+
+                            ret
+
+                            endif
+
+
+
+
                             ; SNARAM to &BE00
+
+                            ifdef FLAVOR_CPCBOOSTER
 SNA_ROM_Get_SNARAM
                             ld bc,&FF28
                             ld l,&F0
@@ -662,6 +738,26 @@ SNA_ROM_Get_SNARAM_loop
                             bit 4,l
                             jr z,SNA_ROM_Get_SNARAM_loop
                             ret
+
+                            endif
+
+                            ifdef FLAVOR_ALBIREO
+
+SNA_ROM_Get_SNARAM
+                             ld hl,&BE00
+                             LD DE,&0AF0 ; CMD_READ8 + Address
+SNA_ROM_Get_SNARAM_loop
+                            LD BC,&FE80
+                            OUT (C),D ; READ8
+                            INC C
+                            OUT (C),E ; Address
+                            INC E
+                            INI
+                            INC B
+                            BIT 4,L
+                            JR Z,SNA_ROM_Get_SNARAM_loop
+                            ret
+                            endif
 
                             ; Default 16 bytes SNARAM
                             ; "Aks" is a tag to detect if SNARAM is already initialized or not
