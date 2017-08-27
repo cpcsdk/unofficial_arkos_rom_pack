@@ -143,16 +143,16 @@ TestCRTC
     ld (TypeCRTC),a
     di                      ; CRTC 0,1,2,3,4
     call TestLongueurVBL    ;      0,1,1,0,0
-    call TestBFxx       ;      0,1,1,0,0,alien
-    call TestBExx       ;      0,0,0,1,1,alien
-    call TestFinVBL     ;      0,0,0,1,1,alien
-    call TestR4R5       ;      0,0,0,1,1,alien
-    call TestRegsWO     ;      0,0,0,1,1
-    call TestBloc       ;      0,0,0,1,1,alien
-    call TestBorder     ;      0,1,0,0,0
-    call TestRAZPPI     ;      0,0,0,1,0,alien
-    call TestPortBPPI   ;      0,0,0,1,0
-    call TestReg31      ;      x,1,x,1,1
+    ;call TestBFxx          ;      0,1,1,0,0,alien
+    call TestBExx           ;      0,0,0,1,1,alien
+    ;call TestFinVBL        ;      0,0,0,1,1,alien
+    ;call TestR4R5          ;      0,0,0,1,1,alien
+    call TestRegsWO         ;      0,0,0,1,1
+    ;call TestBloc          ;      0,0,0,1,1,alien
+    call TestBorder         ;      0,1,0,0,0
+    call TestRAZPPI         ;      0,0,0,1,0,alien
+    ;call TestPortBPPI      ;      0,0,0,1,0
+    ;call TestReg31         ;      x,1,x,1,1
     ei
     ld a,(TypeCRTC)
    
@@ -224,6 +224,7 @@ WaitTLV dec hl      ; 983 micro-secondes
     jp Type034  ; Sinon on a un Type 0,3,4
 
 
+    if 0
 ; Test basé sur la lecture des registres 12 et 13
 ; sur le port 0xBFxx
 ; Permet de différencier les Types 0,3,4 et 1,2
@@ -250,6 +251,8 @@ TestBFxx
     or a        ; Si la valeur est non nulle
     jp nz,Type034   ; alors on a un Type 0,3,4
     ret
+
+    endif
 
 
 ; Test basé sur la lecture des registres 12 et 13
@@ -391,6 +394,7 @@ Change  ld c,a
             ; valeur de ces deux registres
 
 
+    if 0
 ; Test bas{ sur la lecture des registres 4 et 5
 ; Permet de diff{rencier les Types 0,1,2 des 3,4
 
@@ -431,6 +435,8 @@ CPRHRL  ld b,0xbf    ; On lit la valeur du registre
     cp c        ; On la compare @ C
     ret
 
+    endif
+
 
 ; Test bas{ sur la valeur de retour sur les registres
 ; CRTC en {criture seule
@@ -460,6 +466,7 @@ LoopTRI ld b,0xbc    ; On s{lectionne le
         ret
 
 
+        if 0
 ; Test bas{ sur la possibilit{ de programmer le port B
 ; en sortie
 ; Permet d'identifier le Type 3
@@ -496,7 +503,10 @@ NoSyncTPBP1
     jp z,Type0124   ; alors on a Type 0,1,2,4
     jp Type3    ; Sinon on a un Type 3
 
+    endif
 
+
+    if 0
 ; Test bas{ sur la d{tection de la derni}re
 ; ligne de VBL
 ; Permet de diff{rencier les Types 0,1,2 des 3,4
@@ -553,7 +563,10 @@ WaitTfV dec hl      ; 388 micro-secondes
     jp nz,Type34    ; on a un Type 3 ou 4
     jp TypeAlien    ; Sinon on a un probl}me
 
+    endif
 
+
+    if 0
 ; Test bas{ sur le statut particulier du registre 31
 ; Permet d'identifier les Types 1, 3 et 4
 
@@ -574,7 +587,9 @@ TestReg31
     ret     ; sinon on ne peut rien
             ; conclure
 
-    
+    endif
+
+    if 0
 ; Test bas{ sur la d{tection des blocs 0 et 1
 ; Permet de diff{rencier les Types 0,1,2 des 3,4
 
@@ -632,6 +647,8 @@ TBActif ld a,0xa0    ; Si pour le bloc 0 on n'a pas
     jp nz,TypeAlien
     jp Type34   ; Sinon on a un Type 3 ou 4
 
+    endif
+
 
 ; Routines de typage
 
@@ -686,4 +703,4 @@ TypeAlien
 
 ; Variables
 
-TypeCRTC    db 0xff 
+TypeCRTC equ #be37
