@@ -2,16 +2,8 @@
 ;   org #1000
     nolist
 
-
-
-
-
 ;   **** TODO
 ;   Bugs lock AFT ? 
-
-
-
-
 
 
 AD_CPCBooster equ #9c00     ;Ad CPCB une fois copie en RAM. Ne pas deborder sur 9e00 ! Writedsk...
@@ -24,8 +16,8 @@ AD_CPCBooster equ #9c00     ;Ad CPCB une fois copie en RAM. Ne pas deborder sur 
 
 
     defb 1      ;type ROM
-    defb 0      ;mark number
-    defb 0      ;version number
+    defb 1      ;mark number
+    defb 1      ;version number
     defb 0      ;mod number
     defw TABINSTR
     jp AKSRomInit
@@ -137,7 +129,19 @@ MKINI2
     scf
     ret
 TXTROM1 defb 255,"Rom ",0
-TXTROM2 defb " : ",254,"Arkos Rom V1.0 : ",#f,1,124,"AKSH",254,". Crtc ",#f,1,0
+
+    ifdef FLAVOR_CPCWIFI
+TXTROM2 defb " ",254,"Arkos ROM V1.1 M4: ",#f,1,124,"AKSH",254,". Crtc",#f,1,0
+    endif
+
+    ifdef FLAVOR_CPCBOOSTER
+TXTROM2 defb ": ",254,"Arkos V1.1 Booster: ",#f,1,124,"AKSH",254,". Crtc",#f,1,0
+    endif
+
+    ifdef FLAVOR_ALBIREO
+TXTROM2 defb " ",254,"Arkos V1.1 Albireo: ",#f,1,124,"AKSH",254,". Crtc",#f,1,0
+    endif
+
 TXTROM3 defb #d,#a,0
 
 PHRBB5A ld a,(hl)
