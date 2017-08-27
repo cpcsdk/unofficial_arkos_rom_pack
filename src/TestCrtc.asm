@@ -174,19 +174,19 @@ TestCRTC
      ld a,0xf
     ret
    
-Type_0  ld a,0
+Type_0  ld a,'0'
     ret
 
-Type_1  ld a,1
+Type_1  ld a,'1'
     ret
 
-Type_2  ld a,2
+Type_2  ld a,'2'
     ret
 
-Type_3  ld a,3
+Type_3  ld a,'3'
     ret
 
-Type_4  ld a,4
+Type_4  ld a,'4'
     ret
 
 
