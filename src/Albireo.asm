@@ -203,10 +203,12 @@ CPCB_GetByte
 ;A=byte
 CPCB_SendByte
     LD  BC,ACE_LSR
+    PUSH DE
 .wait_dr_flag:  ; Test if at least one byte is in the FIFO
     IN  D,(C)
     BIT ACE_LSR_THRE,D
     JR  Z,.wait_dr_flag
     LD  C,ACE_THRl
     OUT (C),A
+    POP DE
     ret
