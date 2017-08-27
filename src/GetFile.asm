@@ -13,7 +13,7 @@
 GF_STANDALONE equ 0
 
 
-GF_ADCopyPrg equ #a000          ;Ou on copie le programme.
+GF_ADCopyPrg equ #9E00          ;Ou on copie le programme.
 GF_Diff equ GF_DebutCode-GF_ADCopyPrg
 
 
