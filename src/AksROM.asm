@@ -128,10 +128,10 @@ MKINI2
     pop bc
     scf
     ret
-TXTROM1 defb 255,"Rom ",0
+TXTROM1 defb 255,"Rom",0
 
     ifdef FLAVOR_CPCWIFI
-TXTROM2 defb " ",254,"Arkos ROM V1.1 M4: ",#f,1,124,"AKSH",254,". Crtc",#f,1,0
+TXTROM2 defb ": ",254,"Arkos ROM V1.1 M4: ",#f,1,124,"AKSH",254,". Crtc",#f,1,0
     endif
 
     ifdef FLAVOR_CPCBOOSTER
@@ -139,7 +139,7 @@ TXTROM2 defb ": ",254,"Arkos V1.1 Booster: ",#f,1,124,"AKSH",254,". Crtc",#f,1,0
     endif
 
     ifdef FLAVOR_ALBIREO
-TXTROM2 defb " ",254,"Arkos V1.1 Albireo: ",#f,1,124,"AKSH",254,". Crtc",#f,1,0
+TXTROM2 defb ": ",254,"Arkos V1.1 Albireo: ",#f,1,124,"AKSH",254,". Crtc",#f,1,0
     endif
 
 TXTROM3 defb #d,#a,0
