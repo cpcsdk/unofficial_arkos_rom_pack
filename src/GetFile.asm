@@ -211,12 +211,17 @@ GF_FileOk
     call CPCB_AskFileSize
     ei
 
+    ld hl,(GF_Length-GF_Diff+2)       ;Si taille<128 alors pas de header
+    ld a,l
+    or h
+    jr nz, read_header              ; File is larger than 64K
     ld hl,(GF_Length-GF_Diff)       ;Si taille<128 alors pas de header
     ld de,128
     sbc hl,de
     or a
     jr c,GF_RHFin
 
+read_header
 ;Lis le header
     ld hl,128
     ld de,BufferGetBytes
@@ -274,6 +279,12 @@ GF_RHNoExec
     or a
     sbc hl,de
     ld (GF_Length-GF_Diff),hl
+    jr nc, GF_RHFin
+
+    ; Overflow of substraction, decrement second word of filesize
+    ld hl,(GF_Length-GF_Diff+2)
+    dec hl
+    ld (GF_Length-GF_Diff+2),hl
 
 GF_RHFin
 
@@ -315,15 +326,34 @@ GF_AsciiFile
 ;Recoit les octets dans buffer.
 GF_MainLoop
 ;Regarde si le fichier est assez grand pour remplir le buffer.
+
     ld hl,(GF_Length-GF_Diff)
     ld de,NbBytesToGet
     or a
     sbc hl,de
     jr nc,GF_NBBytesOk
     jr z,GF_NBBytesOk
+
+    ; Not enough bytes in 16-bit filesize, see if there are more 64K blocks by decrementing the
+    ; high part of the filesize
+    push hl
+    push de
+    ld hl,(GF_Length-GF_Diff+2)
+
+    ; DEC HL does not update the flags, so do it the complicated way...
+    ld de,1
+    or a
+    sbc hl,de
+    ld (GF_Length-GF_Diff+2),hl
+
+    pop de
+    pop hl
+    jr nc,GF_NBBytesOk
+
 ;Pas assez d'octets dans fichier pour remplir buffer.
     ld de,(GF_Length-GF_Diff)
     ld hl,0
+    ld (GF_Length-GF_Diff+2),hl
 
 GF_NBBytesOk ld (GF_Length-GF_Diff),hl
     ld (GF_BytesWritten-GF_Diff),de
@@ -354,6 +384,9 @@ GF_WriteBytesLoop
 
     ld hl,(GF_Length-GF_Diff)
     ld a,l
+    or h
+    ld hl,(GF_Length-GF_Diff+2)
+    or l
     or h
     jr nz,GF_MainLoop
 
@@ -398,7 +431,7 @@ GF_IsStartGiven db 0
 GF_IsExecGiven db 0
 GF_OrigFileType db 0        ;Pratique pour permettre le basic
 GF_Start dw 0
-GF_Length dw 0,0        ;32 bits ! Mais les 16 bits les plus forts ne servent pas.
+GF_Length dw 0,0        ;32 bits !
 GF_Exec dw 0
 GF_SaveAsAscii db 0
 
